@@ -15,7 +15,7 @@ Another anitaku API serving anime information from anitaku website
 
 ### Vercel
 
-Deploy your own instance of Aniwatch API on Vercel.
+Deploy your own instance of Anitaku API on Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ghoshRitesh12/aniwatch-api)
 
