@@ -15,6 +15,7 @@ import {
   fetchGenreInfo,
   search,
   fetchNewSeason,
+  fetchCompletedAnime,
 } from "./routes/gogoanime"
 import { StreamingServers } from "./types/types"
 
@@ -219,6 +220,22 @@ app.get("/new-season", async (req: Request, res: Response) => {
 
   try {
     const data = await fetchNewSeason(Number(page)).catch((err) =>
+      res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+  }
+})
+
+app.get("/completed-anime", async (req: Request, res: Response) => {
+  const page = req.query.page || 1
+
+  try {
+    const data = await fetchCompletedAnime(Number(page)).catch((err) =>
       res.status(404).send({ message: err })
     )
 
