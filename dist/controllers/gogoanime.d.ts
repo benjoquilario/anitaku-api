@@ -1,0 +1,15 @@
+import { Request, Response, NextFunction } from "express";
+export declare const getSearch: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getAnimeInfo: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getEpisodeSource: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getEpisodeServers: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getRecentEpisodes: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getGenre: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getGenreList: (_: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getTopAiring: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getPopular: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getAnimeMovies: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getAnimeList: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getNewSeason: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getCompletedAnime: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getDownload: (req: Request, res: Response, next: NextFunction) => Promise<void>;

@@ -1,3 +1,11 @@
 import { IVideo } from "../types/types";
-export declare const extract: (videoUrl: URL, isAlt?: boolean) => Promise<IVideo[]>;
-export declare const addSources: (source: any) => void;
+declare class StreamSB {
+    protected serverName: string;
+    protected sources: IVideo[];
+    private readonly host;
+    private readonly host2;
+    private PAYLOAD;
+    extract: (videoUrl: URL, isAlt?: boolean) => Promise<IVideo[]>;
+    private addSources;
+}
+export default StreamSB;
