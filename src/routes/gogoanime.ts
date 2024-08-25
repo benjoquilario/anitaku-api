@@ -13,8 +13,10 @@ import {
   getNewSeason,
   getPopular,
   getRecentEpisodes,
+  getRequestedAnime,
   getSearch,
   getTopAiring,
+  getUpcomingAnime,
 } from "../controllers/gogoanime"
 const router = express.Router()
 
@@ -33,5 +35,7 @@ router.get("/new-season", getNewSeason)
 router.get("/completed-anime", getCompletedAnime)
 router.get("/download", getDownload)
 router.get("/az-list/:letter", getAzList)
+router.get("/upcoming", getUpcomingAnime)
+router.get("/requested", getRequestedAnime)
 
 export default router

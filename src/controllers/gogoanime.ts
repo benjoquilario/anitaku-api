@@ -15,6 +15,8 @@ import {
   fetchNewSeason,
   fetchCompletedAnime,
   fetchAzList,
+  fetchUpcomingAnime,
+  fetchRequestList,
 } from "../parsers/gogoganime"
 import { StreamingServers } from "../types/types"
 import createHttpError from "http-errors"
@@ -344,6 +346,48 @@ export const getDownload = async (
     }
 
     const data = await fetchDirectDownloadLink(downloadLink).catch((err) =>
+      res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+    next(error)
+  }
+}
+
+export const getUpcomingAnime = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const page = req.query.page || 1
+
+  try {
+    const data = await fetchUpcomingAnime(Number(page)).catch((err) =>
+      res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+    next(error)
+  }
+}
+
+export const getRequestedAnime = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const page = req.query.page || 1
+
+  try {
+    const data = await fetchRequestList(Number(page)).catch((err) =>
       res.status(404).send({ message: err })
     )
 

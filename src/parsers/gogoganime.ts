@@ -16,6 +16,7 @@ import { USER_AGENT, ACCEPT_ENCODING_HEADER, ACCEPT_HEADER } from "../utils"
 
 const animeName = "Gogoanime"
 const baseUrl = "https://anitaku.pe"
+const gogoUrl = "https://gogotaku.info"
 const logo =
   "https://play-lh.googleusercontent.com/MaGEiAEhNHAJXcXKzqTNgxqRmhuKB1rCUgb15UrN_mWUNRnLpO5T1qja64oRasO7mn0"
 const classPath = "ANIME.Gogoanime"
@@ -819,6 +820,130 @@ export const fetchAzList = async (letter: string, page: number = 1) => {
       hasNextPage: hasNextPage,
       results: animeList,
     }
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw createHttpError(
+        err?.response?.status || 500,
+        err?.response?.statusText || "Something went wrong"
+      )
+    }
+    // @ts-ignore
+    throw createHttpError.InternalServerError(err?.message)
+  }
+}
+
+export const fetchUpcomingAnime = async (page: number = 1) => {
+  const results: ISearch<IAnimeResult> = {
+    results: [],
+    hasNextPage: false,
+    currentPage: 0,
+  }
+
+  try {
+    const url = `${gogoUrl}/upcoming-anime/tv-series?page=${page}`
+
+    const { data } = await axios.get(url, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        "Accept-Encoding": ACCEPT_ENCODING_HEADER,
+        Accept: ACCEPT_HEADER,
+      },
+    })
+
+    const $: CheerioAPI = load(data)
+
+    $("div.page_content > ul li").each((i, el) => {
+      const a = $(el).find("div.name > a")
+      const pRelease = $(el).find("p.released")
+      const pName = $(el).find("div.name > a")
+      const id = a.attr("href")?.replace("/category/", "")
+
+      results.results.push({
+        id: id!,
+        title: a.attr("title")! || pName.text()!,
+        releaseDate: pRelease.text(),
+        image: $(el).find("div.img > a img").attr("src"),
+        url: `${baseUrl}/category/${id}`,
+      })
+    })
+
+    const hasNextPage = !$("div.anime_name.anime_movies > div > div > ul > li")
+      .last()
+      .hasClass("selected")
+
+    results.hasNextPage = hasNextPage
+    results.currentPage = page
+
+    return results
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw createHttpError(
+        err?.response?.status || 500,
+        err?.response?.statusText || "Something went wrong"
+      )
+    }
+    // @ts-ignore
+    throw createHttpError.InternalServerError(err?.message)
+  }
+}
+
+export const fetchRequestList = async (page: number = 1) => {
+  const results: ISearch<IAnimeResult> = {
+    results: [],
+    hasNextPage: false,
+    currentPage: 0,
+  }
+
+  try {
+    const url = `${gogoUrl}/requested-list.html?page=${page}`
+
+    const { data } = await axios.get(url, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        "Accept-Encoding": ACCEPT_ENCODING_HEADER,
+        Accept: ACCEPT_HEADER,
+      },
+    })
+
+    const $: CheerioAPI = load(data)
+
+    $("div.page_content > ul li").each((i, el) => {
+      const info = $(el).find("div.info")
+      const cover = $(el).find("div.cover")
+      const a = info.find("a").attr("href")!
+      const id = a.replace("/requested/", "")
+
+      results.results.push({
+        id: id!,
+        title: info.find("a").attr("title")!,
+        releaseDate: info
+          .find("p:nth-child(3)")
+          .text()
+          .replace("Released: ", ""),
+        image: cover.find("a img").attr("data-original")!,
+        url: `${baseUrl}/category/${id}`,
+        requestStatus: cover.find("div.request_top span").text(),
+        status: info
+          .find("p:nth-child(4)")
+          .text()
+          .trim()
+          .replace("Status: ", "") as MediaStatus,
+        description: info
+          .find("p:nth-child(5)")
+          .text()
+          .trim()
+          .replace("Plot Summary: ", "")!,
+      })
+    })
+
+    const hasNextPage = !$("div.anime_name.anime_movies > div > div > ul > li")
+      .last()
+      .hasClass("selected")
+
+    results.hasNextPage = hasNextPage
+    results.currentPage = page
+
+    return results
   } catch (err) {
     if (err instanceof AxiosError) {
       throw createHttpError(
