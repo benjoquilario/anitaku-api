@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import { load } from "cheerio"
+import { CheerioAPI, load } from "cheerio"
 import type {
   ISearch,
   IAnimeResult,
@@ -12,7 +12,7 @@ import createHttpError, { type HttpError } from "http-errors"
 import { MediaStatus, SubOrSub, StreamingServers } from "../types/types"
 import GogoCDN from "../extractors/gogocdn"
 import StreamSB from "../extractors/streamsb"
-import { USER_AGENT } from "../utils"
+import { USER_AGENT, ACCEPT_ENCODING_HEADER, ACCEPT_HEADER } from "../utils"
 
 const animeName = "Gogoanime"
 const baseUrl = "https://anitaku.pe"
@@ -736,6 +736,64 @@ export const fetchAnimeList = async (
       const genres: string[] = []
       const entryBody = $("p.type", $(element).attr("title")!)
       const genresEl = entryBody.first()
+      genresEl.find("a").each((_idx, genreAnchor) => {
+        genres.push($(genreAnchor).attr("title")!)
+      })
+
+      const releaseDate = $(entryBody.get(1)).text()
+
+      const img = $("div", $(element).attr("title")!)
+      const a = $(element).find("a")
+      animeList.push({
+        id: a.attr("href")?.replace(`/category/`, "")!,
+        title: a.text(),
+        image: $(img).find("img").attr("src"),
+        url: `${baseUrl}${a.attr("href")}`,
+        genres,
+        releaseDate,
+      })
+    })
+    const hasNextPage = !$("div.anime_name.anime_list > div > div > ul > li")
+      .last()
+      .hasClass("selected")
+    return {
+      currentPage: page,
+      hasNextPage: hasNextPage,
+      results: animeList,
+    }
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw createHttpError(
+        err?.response?.status || 500,
+        err?.response?.statusText || "Something went wrong"
+      )
+    }
+    // @ts-ignore
+    throw createHttpError.InternalServerError(err?.message)
+  }
+}
+
+export const fetchAzList = async (letter: string, page: number = 1) => {
+  const animeList: IAnimeResult[] = []
+
+  try {
+    const url = `${baseUrl}/anime-list-${letter}?page=${page}`
+
+    const { data } = await axios.get(url, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        "Accept-Encoding": ACCEPT_ENCODING_HEADER,
+        Accept: ACCEPT_HEADER,
+      },
+    })
+
+    const $: CheerioAPI = load(data)
+
+    $(".anime_list_body .listing li").each((_index, element) => {
+      const genres: string[] = []
+      const entryBody = $("p.type", $(element).attr("title")!)
+      const genresEl = entryBody.first()
+
       genresEl.find("a").each((_idx, genreAnchor) => {
         genres.push($(genreAnchor).attr("title")!)
       })

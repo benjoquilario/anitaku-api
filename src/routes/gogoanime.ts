@@ -3,6 +3,7 @@ import {
   getAnimeInfo,
   getAnimeList,
   getAnimeMovies,
+  getAzList,
   getCompletedAnime,
   getDownload,
   getEpisodeServers,
@@ -31,5 +32,6 @@ router.get("/anime-list", getAnimeList)
 router.get("/new-season", getNewSeason)
 router.get("/completed-anime", getCompletedAnime)
 router.get("/download", getDownload)
+router.get("/az-list/:letter", getAzList)
 
 export default router

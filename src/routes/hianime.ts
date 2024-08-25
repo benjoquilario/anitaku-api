@@ -16,6 +16,8 @@ import {
   getTrending,
   getTvSeries,
   getStudio,
+  getAzList,
+  getGenre,
 } from "../controllers/hianime"
 
 const router = express.Router()
@@ -35,5 +37,7 @@ router.get("/latest-episodes", getLatestEpisodes)
 router.get("/top-upcoming", getTopUpcoming)
 router.get("/airing-schedule/:data", getAiringSchedule)
 router.get("/studio/:studioId", getStudio)
+router.get("/az-list/:letter", getAzList)
+router.get("/genre/:genre", getGenre)
 
 export default router

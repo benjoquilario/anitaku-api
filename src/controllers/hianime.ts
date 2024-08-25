@@ -5,8 +5,10 @@ import {
   fetchAiringSchedule,
   fetchAnimeEpisodes,
   fetchAnimeInfo,
+  fetchAzList,
   fetchEpisodeServers,
   fetchEpisodeSource,
+  fetchGenre,
   fetchLatestCompleted,
   fetchLatestEpisodes,
   fetchMostFavorite,
@@ -315,6 +317,50 @@ export const getStudio = async function (
 
   try {
     const data = await fetchStudio(studioId, Number(page)).catch((err) =>
+      res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+    next(error)
+  }
+}
+
+export const getAzList = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const letter = (req.params as { letter: string }).letter
+  const page = req.query.page || 1
+
+  try {
+    const data = await fetchAzList(letter.toUpperCase(), Number(page)).catch(
+      (err) => res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+    next(error)
+  }
+}
+
+export const getGenre = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const genre = (req.params as { genre: string }).genre
+  const page = req.query.page || 1
+
+  try {
+    const data = await fetchGenre(genre, Number(page)).catch((err) =>
       res.status(404).send({ message: err })
     )
 
