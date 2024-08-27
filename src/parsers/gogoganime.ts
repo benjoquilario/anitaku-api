@@ -206,7 +206,7 @@ export const fetchAnimeData = async (id: string) => {
     )
       .text()
       .trim()
-    animeInfo.url = id
+    animeInfo.url = `${baseUrl}/category/${new URL(id).pathname.split("/")[2]}`
     animeInfo.image = $("div.anime_info_body_bg > img").attr("data-original")
     animeInfo.releaseDate = $("div.anime_info_body_bg > p:nth-child(7)")
       .text()
@@ -279,6 +279,35 @@ export const fetchAnimeData = async (id: string) => {
           .text()
           .replace("Released: ", "")
           .trim(),
+      })
+    })
+
+    animeInfo.charactersAndVoiceActors = []
+
+    $("div.list_characters_voice > ul > li").each((i, el) => {
+      animeInfo.charactersAndVoiceActors?.push({
+        characters: {
+          image: $(el)
+            .find("div.left div.picture div.img > a img")
+            .attr("data-original"),
+          id: $(el)
+            .find("div.left div.picture div.img > a")
+            .attr("href")
+            ?.replace("/characters", ""),
+          title: $(el).find("div.left div.bottom p.title > a").attr("title"),
+          roles: $(el).find("div.left div.bottom p.roles").text().trim(),
+        },
+        voiceActors: {
+          image: $(el)
+            .find("div.right div.picture div.img > a img")
+            .attr("data-original"),
+          id: $(el)
+            .find("div.right div.picture div.img > a")
+            .attr("href")
+            ?.replace("/characters", ""),
+          title: $(el).find("div.right div.bottom p.title > a").attr("title"),
+          roles: $(el).find("div.right div.bottom p.roles").text().trim(),
+        },
       })
     })
 
