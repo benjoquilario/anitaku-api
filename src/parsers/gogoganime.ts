@@ -85,9 +85,9 @@ export const fetchAnimeInfo = async (
     totalEpisodes: 0,
   }
   try {
-    const res = await axios.get(id)
+    const { data } = await axios.get(id)
 
-    const $ = load(res.data)
+    const $: CheerioAPI = load(data)
 
     animeInfo.id = new URL(id).pathname.split("/")[2]
     animeInfo.title = $(
@@ -163,6 +163,124 @@ export const fetchAnimeInfo = async (
     animeInfo.episodes = animeInfo.episodes.reverse()
 
     animeInfo.totalEpisodes = parseInt(ep_end ?? "0")
+
+    return animeInfo
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      throw createHttpError(
+        err?.response?.status || 500,
+        err?.response?.statusText || "Something went wrong"
+      )
+    }
+    // @ts-ignore
+    throw createHttpError.InternalServerError(err?.message)
+  }
+}
+
+export const fetchAnimeData = async (id: string) => {
+  const animeInfo: IAnimeInfo = {
+    id: "",
+    title: "",
+    url: "",
+    genres: [],
+  }
+
+  try {
+    if (!id.includes("gogoanime")) id = `${gogoUrl}/category/${id}`
+
+    const { data } = await axios.get(id, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        "Accept-Encoding": ACCEPT_ENCODING_HEADER,
+        Accept: ACCEPT_HEADER,
+      },
+    })
+
+    const $: CheerioAPI = load(data)
+
+    const info = $("div.anime_info_body_bg")
+
+    animeInfo.id = new URL(id).pathname.split("/")[2]
+    animeInfo.title = $(
+      "section.content_left > div.main_body > div:nth-child(2) > div.anime_info_body_bg > h1"
+    )
+      .text()
+      .trim()
+    animeInfo.url = id
+    animeInfo.image = $("div.anime_info_body_bg > img").attr("data-original")
+    animeInfo.releaseDate = $("div.anime_info_body_bg > p:nth-child(7)")
+      .text()
+      .trim()
+      .replace("Released: ", "")
+
+    animeInfo.description = $("div.anime_info_body_bg > div.description")
+      .text()
+      .trim()
+      .replace("Plot Summary: ", "")
+
+    animeInfo.subOrDub = animeInfo.title.toLowerCase().includes("dub")
+      ? SubOrSub.DUB
+      : SubOrSub.SUB
+
+    animeInfo.type = $("div.anime_info_body_bg > p:nth-child(3)")
+      .text()
+      .trim()
+      .replace("Type: ", "") as MediaFormat
+
+    animeInfo.status = MediaStatus.UNKNOWN
+
+    switch (
+      $("div.anime_info_body_bg > p:nth-child(8)")
+        .text()
+        .trim()
+        .replace("Status: ", "")
+    ) {
+      case "Ongoing":
+        animeInfo.status = MediaStatus.ONGOING
+        break
+      case "Completed":
+        animeInfo.status = MediaStatus.COMPLETED
+        break
+      case "Upcoming":
+        animeInfo.status = MediaStatus.NOT_YET_AIRED
+        break
+      default:
+        animeInfo.status = MediaStatus.UNKNOWN
+        break
+    }
+    animeInfo.otherName = $("div.anime_info_body_bg > p:nth-child(10) > a")
+      .text()
+      .replace("Other name: ", "")
+      .replace(/;/g, ",")
+
+    animeInfo.genres = $("div.anime_info_body_bg > p:nth-child(6)")
+      .text()
+      .replace("Genre: ", "")
+      .split(", ")
+
+    animeInfo.countryOfOrigin = $("div.anime_info_body_bg > p:nth-child(9)")
+      .text()
+      .replace("Country: ", "")
+
+    animeInfo.airDate = $("div.anime_info_body_bg > p:nth-child(11)")
+      .text()
+      .replace("Aired: ", "")
+    animeInfo.relations = []
+
+    $("div.page_content.related_anime > ul > li").each((i, el) => {
+      animeInfo.relations?.push({
+        id: $(el).find("div.name > a").attr("href")?.replace("/category/", "")!,
+        title:
+          $(el).find("div.name > a").attr("title")! ??
+          $(el).find("div.name > a > h4").text()!,
+        image: $(el).find("div.img > a img").attr("data-original"),
+        releaseDate: $(el)
+          .find("p.released")
+          .text()
+          .replace("Released: ", "")
+          .trim(),
+      })
+    })
 
     return animeInfo
   } catch (err) {

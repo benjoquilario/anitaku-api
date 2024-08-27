@@ -18,10 +18,12 @@ import {
   getTopAiring,
   getUpcomingAnime,
 } from "../controllers/gogoanime"
+import { getAnimeDataInformation } from "../controllers/hianime"
 const router = express.Router()
 
 router.get("/search/:query", getSearch)
 router.get("/info/:animeId", getAnimeInfo)
+router.get("/data/:animeId", getAnimeDataInformation)
 router.get("/watch/:episodeId", getEpisodeSource)
 router.get("/servers/:episodeId", getEpisodeServers)
 router.get("/recent-episodes", getRecentEpisodes)
