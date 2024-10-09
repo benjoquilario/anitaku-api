@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "undefined/subscriptions/f52438c2-b683-4ea1-831a-4ad807eecc12/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/anime-api",
+  "appService.deploySubpath": "."
+}
