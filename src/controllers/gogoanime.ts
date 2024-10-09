@@ -18,6 +18,7 @@ import {
   fetchUpcomingAnime,
   fetchRequestList,
 } from "../parsers/gogoganime"
+
 import { StreamingServers } from "../types/types"
 import createHttpError from "http-errors"
 
@@ -31,7 +32,7 @@ export const getSearch = async (
     const page = req.query.page
 
     if (query === undefined)
-      throw createHttpError.BadRequest("Search keyword required")
+      res.status(400).send({ message: "Search query required" })
 
     const data = await search(query, Number(page)).catch((err) =>
       res.status(404).send({ message: err })
@@ -56,7 +57,10 @@ export const getAnimeInfo = async (
       (req.params as { animeId: string }).animeId
     )
 
-    if (animeId === null) throw createHttpError.BadRequest("Anime Id required")
+    if (animeId === null)
+      res.status(400).send({
+        message: "Anime Id required",
+      })
 
     const data = await fetchAnimeInfo(animeId).catch((err) =>
       res.status(404).send({ message: err })
@@ -81,7 +85,7 @@ export const getEpisodeSource = async (
     const server = (req.query as { server: StreamingServers }).server
 
     if (episodeId === null)
-      throw createHttpError.BadRequest("Episode Id required")
+      res.status(400).send({ message: "Episode Id required" })
 
     const data = await fetchEpisodeSources(episodeId, server).catch((err) =>
       res.status(404).send({ message: err })
@@ -173,7 +177,7 @@ export const getAzList = async (
   const letter = (req.params as { letter: string }).letter
   const page = req.query.page || 1
 
-  if (letter === null) throw createHttpError.BadRequest("Letter is required")
+  if (letter === null) res.status(400).send({ message: "Letter is required" })
 
   try {
     const data = await fetchAzList(letter, Number(page)).catch((err) =>
