@@ -23,7 +23,6 @@ import {
   fetchTvSeries,
   search,
 } from "../parsers/hianime"
-import { fetchAnimeData } from "../parsers/gogoganime"
 
 export const getSearch = async (
   req: Request,
@@ -477,27 +476,27 @@ export const getAiringSchedule = async (
   }
 }
 
-export const getAnimeDataInformation = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const animeId = decodeURIComponent(
-      (req.params as { animeId: string }).animeId
-    )
+// export const getAnimeDataInformation = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const animeId = decodeURIComponent(
+//       (req.params as { animeId: string }).animeId
+//     )
 
-    if (animeId === null) throw createHttpError.BadRequest("Anime Id required")
+//     if (animeId === null) throw createHttpError.BadRequest("Anime Id required")
 
-    const data = await fetchAnimeData(animeId).catch((err) =>
-      res.status(404).send({ message: err })
-    )
+//     const data = await fetchAnimeData(animeId).catch((err) =>
+//       res.status(404).send({ message: err })
+//     )
 
-    res.status(200).json(data)
-  } catch (error) {
-    res
-      .status(500)
-      .send({ message: "Something went wrong. Please try again later." })
-    next(error)
-  }
-}
+//     res.status(200).json(data)
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .send({ message: "Something went wrong. Please try again later." })
+//     next(error)
+//   }
+// }

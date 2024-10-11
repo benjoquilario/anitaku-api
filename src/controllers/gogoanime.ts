@@ -17,7 +17,8 @@ import {
   fetchAzList,
   fetchUpcomingAnime,
   fetchRequestList,
-} from "../parsers/gogoganime"
+  fetchAnimeData,
+} from "../parsers/gogoanime"
 
 import { StreamingServers } from "../types/types"
 import createHttpError from "http-errors"
@@ -63,6 +64,34 @@ export const getAnimeInfo = async (
       })
 
     const data = await fetchAnimeInfo(animeId).catch((err) =>
+      res.status(404).send({ message: err })
+    )
+
+    res.status(200).json(data)
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Something went wrong. Please try again later." })
+    next(error)
+  }
+}
+
+export const getAnimeData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const animeId = decodeURIComponent(
+      (req.params as { animeId: string }).animeId
+    )
+
+    if (animeId === null)
+      res.status(400).send({
+        message: "Anime Id required",
+      })
+
+    const data = await fetchAnimeData(animeId).catch((err) =>
       res.status(404).send({ message: err })
     )
 

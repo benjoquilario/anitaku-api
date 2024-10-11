@@ -1,4 +1,5 @@
 import { fetchAnimeInfo } from "./anime-info"
+import { fetchAnimeData } from "./anime-data"
 import { fetchEpisodeServers } from "./episode-servers"
 import { fetchAnimeList } from "./anime-list"
 import { fetchAzList } from "./az-list"
@@ -34,4 +35,5 @@ export {
   fetchTopAiring,
   search,
   fetchUpcomingAnime,
+  fetchAnimeData,
 }
