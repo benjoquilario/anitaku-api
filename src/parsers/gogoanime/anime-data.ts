@@ -9,6 +9,7 @@ import { gogoTakuUrl, gogoBaseUrl } from "../../utils/constants"
 import instance, { AxiosError } from "../../utils/axios"
 import { CheerioAPI, load } from "cheerio"
 import createHttpError from "http-errors"
+import axios from "axios"
 
 export const fetchAnimeData = async (id: string) => {
   const animeInfo: IAnimeInfo = {
@@ -19,9 +20,9 @@ export const fetchAnimeData = async (id: string) => {
   }
 
   try {
-    if (!id.includes("gogoanime")) id = `/category/${id}`
+    if (!id.includes("gogoanime")) id = `${gogoTakuUrl}/category/${id}`
 
-    const { data } = await instance(gogoTakuUrl).get(id, {
+    const { data } = await axios.get(id, {
       headers: {
         "User-Agent": USER_AGENT,
         "Accept-Encoding": ACCEPT_ENCODING_HEADER,
